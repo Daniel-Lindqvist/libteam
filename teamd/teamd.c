@@ -1563,18 +1563,19 @@ static int teamd_start(struct teamd_context *ctx, enum teamd_exit_code *p_ret)
 		goto pid_file_remove;
 	}
 
-	if (daemon_pid_file_create() < 0) {
-		teamd_log_err("Could not create PID file.");
-		daemon_retval_send(errno);
-		return -errno;
-	}
-
 	err = teamd_init(ctx);
 	if (err) {
 		teamd_log_err("teamd_init() failed.");
 		daemon_retval_send(-err);
 		goto signal_done;
 	}
+
+	if (daemon_pid_file_create() < 0) {
+		teamd_log_err("Could not create PID file.");
+		daemon_retval_send(errno);
+		return -errno;
+	}
+
 	*p_ret = TEAMD_EXIT_RUNTIME_FAILURE;
 
 	daemon_retval_send(0);
